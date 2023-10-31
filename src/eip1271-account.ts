@@ -1,8 +1,10 @@
-import type { Hex, TypedDataParameter, TypedDataDefinition, CompactSignature, TypedDataDomain, SignableMessage } from 'viem';
-import { concat, toBytes, stringToBytes, bytesToString, size, slice, recoverAddress, keccak256, compactSignatureToSignature, signatureToHex, signatureToCompactSignature, hexToSignature } from 'viem';
+import type { Hex, TypedDataParameter, TypedDataDefinition } from 'viem';
+import { concat, size, slice, recoverAddress, keccak256, compactSignatureToSignature, signatureToHex, signatureToCompactSignature, hexToSignature } from 'viem';
 import { privateKeyToAccount, toAccount } from 'viem/accounts';
-import { hashType, hashDomain as _hashDomain, hashTypedData, hashStruct } from './utils/hashTypedData.js';
+import { hashType, hashTypedData, hashStruct } from './utils/hashTypedData.js';
 import assert from 'assert';
+import { hashDomain } from './utils/eip712.js';
+import { prefixMessage } from './utils/prefixMessage.js';
 
 const wrapperTypeName = 'EIP1271Wrapper';
 
@@ -82,7 +84,7 @@ export function eip1271Account(signerKey: Hex, address: Hex, chainId?: number) {
       async isValidSignature(messageHash: Hex, signature: Hex) {
         const r = slice(signature, 0, 32, { strict: true });
         const yParityAndS = slice(signature, 32, 64, { strict: true });
-        const rawSignature = compactSignatureToSignatureHex({ r, yParityAndS });
+        const rawSignature = signatureToHex(compactSignatureToSignature({ r, yParityAndS }));
 
         const typeHash = slice(signature, 64, 96, { strict: true });
 
@@ -109,43 +111,4 @@ export function eip1271Account(signerKey: Hex, address: Hex, chainId?: number) {
       }
     },
   );
-}
-
-function prefixMessage(message: SignableMessage): string {
-  const messageBytes = (() => {
-    if (typeof message === 'string') return stringToBytes(message)
-    if (message.raw instanceof Uint8Array) return message.raw
-    return toBytes(message.raw)
-  })()
-  const prefixBytes = stringToBytes(
-    `\x19Ethereum Signed Message:\n${messageBytes.length}`,
-  );
-  return bytesToString(concat([prefixBytes, messageBytes]));
-}
-
-function compactSignatureToSignatureHex(s: CompactSignature) {
-  return signatureToHex(compactSignatureToSignature(s));
-}
-
-function makeEIP712DomainType(domain: TypedDataDomain): readonly TypedDataParameter[] {
-  return [
-    typeof domain?.name === 'string' && { name: 'name', type: 'string' },
-    domain?.version && { name: 'version', type: 'string' },
-    typeof domain?.chainId === 'number' && {
-      name: 'chainId',
-      type: 'uint256',
-    },
-    domain?.verifyingContract && {
-      name: 'verifyingContract',
-      type: 'address',
-    },
-    domain?.salt && { name: 'salt', type: 'bytes32' },
-  ].filter(Boolean);
-}
-
-function hashDomain(domain: TypedDataDomain): Hex {
-  return _hashDomain({
-    domain,
-    types: { EIP712Domain: makeEIP712DomainType(domain) },
-  });
 }
