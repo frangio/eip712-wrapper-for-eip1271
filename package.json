@@ -1,0 +1,14 @@
+{
+  "name": "eip712-wrapper-for-eip1271",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "tsx src/test.ts"
+  },
+  "dependencies": {
+    "@types/node": "^16.18.60",
+    "tsx": "^3.14.0",
+    "typescript": "^5.2.2",
+    "viem": "^1.18.1"
+  }
+}
