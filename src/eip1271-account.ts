@@ -1,8 +1,8 @@
+import assert from 'assert';
 import type { Hex, TypedDataParameter, TypedDataDefinition } from 'viem';
 import { concat, size, slice, recoverAddress, keccak256, compactSignatureToSignature, signatureToHex, signatureToCompactSignature, hexToSignature } from 'viem';
 import { privateKeyToAccount, toAccount } from 'viem/accounts';
-import { hashType, hashTypedData, hashStruct } from './utils/hashTypedData.js';
-import assert from 'assert';
+import { hashType, hashStruct } from './utils/hashTypedData.js';
 import { hashDomain } from './utils/eip712.js';
 import { prefixMessage } from './utils/prefixMessage.js';
 
