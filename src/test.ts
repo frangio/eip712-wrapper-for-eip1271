@@ -1,12 +1,17 @@
-import { TypedDataDefinition, getContractAddress, hashMessage, hashTypedData } from 'viem';
-import { privateKeyToAddress } from 'viem/accounts';
+import { type TypedDataDefinition, createWalletClient, getContractAddress, hashMessage, hashTypedData, http } from 'viem';
+import { privateKeyToAccount } from 'viem/accounts';
 import { eip1271Account } from './eip1271-account.js';
 
 const signerKey = '0x2e8193b8019d1086a29a921b8ac5118079bb83de0613e312bbc2a17a7ee824e6';
 
-const accountAddress = getContractAddress({ from: privateKeyToAddress(signerKey), nonce: 0n });
+const signerClient = createWalletClient({
+  account: privateKeyToAccount(signerKey),
+  transport: http('http://localhost:8545'),
+});
 
-const account = eip1271Account(signerKey, accountAddress);
+const accountAddress = getContractAddress({ from: signerClient.account.address, nonce: 0n });
+
+const account = eip1271Account(signerClient, accountAddress);
 
 // personal_sign
 {
