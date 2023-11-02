@@ -60,7 +60,7 @@ export function eip1271Account(accountAddress: Hex, signerClient: WalletClientWi
         assert(types[wrapperTypeName] === undefined, `Duplicate type definition for ${wrapperTypeName}`);
 
         const messageDomain = typedData.domain;
-        assert(messageDomain !== undefined, `Duplicate type definition for ${wrapperTypeName}`);
+        assert(messageDomain !== undefined, 'Domain missing');
 
         const messageDomainHash = hashDomain(messageDomain);
         const contentsHash = hashStruct({ data: typedData.message, primaryType: typedData.primaryType, types });
