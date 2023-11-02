@@ -11,7 +11,7 @@ const signerClient = createWalletClient({
 
 const accountAddress = getContractAddress({ from: signerClient.account.address, nonce: 0n });
 
-const account = eip1271Account(signerClient, accountAddress);
+const account = eip1271Account(accountAddress, signerClient);
 
 // personal_sign
 {
