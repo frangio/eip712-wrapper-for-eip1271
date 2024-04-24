@@ -54,7 +54,7 @@ The messages that can be signed by this API method are much richer: they are typ
 
 This allows us to carefully construct a message envelope that gives full transparency of the signed message contents while also binding it to an EIP-1271 wallet.
 
-A TypeScript implementation of the logic can be found in [`eip1271-account.ts`](/master/src/eip1271-account.ts) in this repository, and a largely compatible Solidity implementation can be found in [#688](https://github.com/Vectorized/solady/pull/688) in the Solady repository.
+A TypeScript implementation of the logic can be found in [`eip1271-account.ts`](/src/eip1271-account.ts) in this repository, and a largely compatible Solidity implementation can be found in [#688](https://github.com/Vectorized/solady/pull/688) in the Solady repository.
 
 In order to bind the signature to a wallet, the wallet defines its own EIP-712 domain, and the envelope will be bound to this domain.
 
@@ -64,7 +64,7 @@ In the case of a `personal_sign` message, the EIP-712 envelope will contain the 
 
 In the case of an `eth_signTypedData` message, the EIP-712 envelope will embed the original message object, so that all of its parameters are displayed to the user. Although the object is fully embedded, the resulting EIP-712 message hash will be completely different from the message hash that a protocol will pass to `isValidSignature`, since the protocol reconstructs it independently from the application-specific parameters. We have no other choice than to include the encoding of the embedded message in the envelope as well, which must include the protocol domain. We will need to include additional data in the signature for the wallet contract to be able to reproduce the envelope hash.
 
-The details are a little too extensive to explain here, and the curious reader is encouraged to check out the TypeScript reference implementation [`eip1271-account.ts`](/master/src/eip1271-account.ts).
+The details are a little too extensive to explain here, and the curious reader is encouraged to check out the TypeScript reference implementation [`eip1271-account.ts`](/src/eip1271-account.ts).
 
 ## Possible Issues
 These EIP-1271 signatures will be up to 4 64-byte words in size. A provider for a smart contract wallet would need to return this signature as the result of a call to `personal_sign` or `eth_signTypedData`, and this may be unsupported by API clients that expect a return value of 129 bytes, or specifically the `r,s,v` parameters of an ECDSA signature, as is for example [specified for EIP-712](https://eips.ethereum.org/EIPS/eip-712#specification-of-the-eth_signtypeddata-json-rpc). The author believes these APIs should be specified as returning opaque blobs of arbitrary size for smart contract wallet support.
